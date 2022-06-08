@@ -1,20 +1,23 @@
 import java.sql.*;
-import java.util.Scanner;
+import java.sql.Date;
+import java.util.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-import java.util.Map;
 import java.util.Scanner;
-import java.util.LinkedHashMap;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.ArrayList;
 
 public class InnReservations {
 
+    public static HashMap<String, String> LinksToInputs = new HashMap<String, String>();
 
     public static void main(String[] args) throws SQLException {
-        String test = System.getenv("HP_JDBC_URL");
+
+        LinksToInputs.put("A", "firstname");
+        LinksToInputs.put("B", "lastname");
+        LinksToInputs.put("D", "Room");
+        LinksToInputs.put("E", "Code");
+
         try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
                 System.getenv("HP_JDBC_USER"),
                 System.getenv("HP_JDBC_PW"))) {
@@ -23,6 +26,7 @@ public class InnReservations {
             Scanner myScan = new Scanner(System.in);  // Create a Scanner object
             System.out.println("Enter number associated with option");
             String optionSelected = " ";
+            conn.setAutoCommit(false);
 
             while (!optionSelected.equals("7")) {
                 printOptions();
@@ -30,7 +34,12 @@ public class InnReservations {
                 optionSelected = myScan.nextLine();
                 if (optionSelected.equals("3")) {
                     reservationChange(myScan, conn);
-
+                }
+                if (optionSelected.equals("4")) {
+                    deleteReservation(myScan, conn);
+                }
+                if(optionSelected.equals("5")){
+                    detailedReservation(myScan,conn);
                 }
             }
         }
@@ -144,6 +153,226 @@ public class InnReservations {
             }
         }
     }
+
+
+    public static void deleteReservation(Scanner scanner, Connection conn) {
+
+        int reservationCode;
+        String confirmation;
+
+
+        System.out.println("Enter the reservation code");
+        reservationCode = scanner.nextInt();
+        scanner.nextLine(); // get rid of the buffer
+        System.out.println("Please confirm that you would like to delete reservation, Y for Yes, N for No");
+        confirmation = scanner.nextLine();
+
+        if (confirmation.equals("Y")) {
+            String updateSql = "DELETE from lab7_reservations where code = ?;";
+            try (PreparedStatement pstmt = conn.prepareStatement(updateSql)) {
+                pstmt.setInt(1, reservationCode);
+                pstmt.execute();
+                conn.commit();
+                System.out.println("Success deleting reservation with code: " + reservationCode);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Error deleting reservation");
+            }
+        }
+    }
+
+    //First name•Last name•A range of dates•Room code•Reservation code
+    public static void detailedReservation(Scanner scanner, Connection conn) {
+        String arg1Option;
+        String arg1 = "";
+        String arg2Option;
+        String arg2 = "";
+        StringBuilder sql_stm = new StringBuilder("select * from reservations where ");
+
+        String date1 = null;
+        String date2 = null;
+
+        System.out.println("Pick a pair from the following list: (A) First Name, (B) Last Name, (C) Range of Dates, (D) Room Code, (E) Reservation Code");
+        System.out.println("Pick first option (type it how it is in the above list, enter 'ANY' for a blank entry");
+        arg1Option = scanner.nextLine();
+        if(arg1Option.equals("A")){
+            System.out.println("Enter First Name");
+            arg1 = scanner.nextLine();
+        }
+        if(arg1Option.equals("B")){
+            System.out.println("Enter Last Name");
+            arg1 = scanner.nextLine();
+        }
+        if(arg1Option.equals("C")){
+            System.out.println("Enter First Date (Format must be YYYY-MM-DD)");
+            date1 = scanner.nextLine();
+            System.out.println("Enter Second Date (Format must be YYYY-MM-DD)");
+            date2 = scanner.nextLine();
+        }
+        if(arg1Option.equals("D")){
+            System.out.println("Enter Room Code");
+            arg1 = scanner.nextLine();
+        }
+        if(arg1Option.equals("E")){
+            System.out.println("Enter Reservation Code");
+            arg1 = scanner.nextLine();
+        }
+        if(arg1Option.equals("ANY")){
+            arg1 = "ANY";
+        }
+
+        while(arg2.equals("")) {
+            System.out.println("Pick second option (type it how it is in the above list, enter 'ANY' for a blank entry");
+            arg2Option = scanner.nextLine();
+            if (arg2Option.equals("A")) {
+                System.out.println("Enter First Name");
+                arg2 = scanner.nextLine();
+            }
+            if (arg2Option.equals("B")) {
+                System.out.println("Enter Last Name");
+                arg2 = scanner.nextLine();
+            }
+            if (arg2Option.equals("C")) {
+                arg2 = "SKIP";
+                System.out.println("Enter First Date (Format must be YYYY-MM-DD)");
+                date1 = scanner.nextLine();
+                System.out.println("Enter Second Date (Format must be YYYY-MM-DD)");
+                date2 = scanner.nextLine();
+            }
+            if (arg2Option.equals("D")) {
+                System.out.println("Enter Room Code");
+                arg2 = scanner.nextLine();
+            }
+            if (arg2Option.equals("E")) {
+                System.out.println("Enter Reservation Code");
+                arg2 = scanner.nextLine();
+            }
+            if(arg2Option.equals("ANY")){
+                arg2 = "ANY";
+            }
+
+
+            if (!arg1Option.equals("C") && !arg2Option.equals("C")) {
+                if (!arg1.equals("ANY") && !arg2.equals("ANY")) {
+                    if(arg1Option.equals("A") || arg1Option.equals("B")){
+                        sql_stm.append(LinksToInputs.get(arg1Option));
+                        sql_stm.append(" LIKE %");
+                        sql_stm.append(arg1);
+                        sql_stm.append("% and ");
+                    }
+                    else{
+                        sql_stm.append(LinksToInputs.get(arg1Option));
+                        sql_stm.append(" = ");
+                        sql_stm.append(arg1);
+                        sql_stm.append(" and ");
+                    }
+                    if(arg2Option.equals("A") || arg2Option.equals("B")){
+                        sql_stm.append(LinksToInputs.get(arg2Option));
+                        sql_stm.append(" LIKE %");
+                        sql_stm.append(arg2);
+                        sql_stm.append("%");
+                    }
+                    else{
+                        sql_stm.append(LinksToInputs.get(arg2Option));
+                        sql_stm.append(" = ");
+                        sql_stm.append(arg2);
+                    }
+                }
+                if (arg1.equals("ANY")) {
+                    if(arg2Option.equals("A") || arg2Option.equals("B")){
+                        sql_stm.append(LinksToInputs.get(arg2Option));
+                        sql_stm.append(" LIKE %");
+                        sql_stm.append(arg2);
+                        sql_stm.append("%");
+                    }
+                    else{
+                        sql_stm.append(LinksToInputs.get(arg2Option));
+                        sql_stm.append(" = ");
+                        sql_stm.append(arg2);
+                    }
+                }
+                if (arg2.equals("ANY")) {
+                    if(arg1Option.equals("A") || arg1Option.equals("B")){
+                        sql_stm.append(LinksToInputs.get(arg1Option));
+                        sql_stm.append(" LIKE %");
+                        sql_stm.append(arg1);
+                        sql_stm.append("%");
+                    }
+                    else{
+                        sql_stm.append(LinksToInputs.get(arg1Option));
+                        sql_stm.append(" = ");
+                        sql_stm.append(arg1);
+
+                    }
+                }
+            }
+            if (arg1Option.equals("C")) {
+                if (arg2.equals("ANY")) {
+                    sql_stm.append("CheckIn >= ");
+                    sql_stm.append(date1);
+                    sql_stm.append(" and ");
+                    sql_stm.append("Checkout <= ");
+                    sql_stm.append(date2);
+                }
+                if (!arg2.equals("ANY")) {
+                    sql_stm.append("CheckIn >= ");
+                    sql_stm.append(date1);
+                    sql_stm.append(" and ");
+                    sql_stm.append("Checkout <= ");
+                    sql_stm.append(date2);
+                    sql_stm.append(" and ");
+                    if(arg2Option.equals("A") || arg2Option.equals("B")){
+                        sql_stm.append(LinksToInputs.get(arg2Option));
+                        sql_stm.append(" LIKE %");
+                        sql_stm.append(arg2);
+                    }
+                    else{
+                        sql_stm.append(LinksToInputs.get(arg2Option));
+                        sql_stm.append(" = ");
+                        sql_stm.append(arg2);
+                    }
+                    sql_stm.append(LinksToInputs.get(arg2Option));
+                    sql_stm.append(" = ");
+                    sql_stm.append(arg2);
+                }
+            }
+
+            if (arg2Option.equals("C")) {
+                if (arg1.equals("ANY")) {
+                    sql_stm.append("CheckIn >= ");
+                    sql_stm.append(date1);
+                    sql_stm.append(" and ");
+                    sql_stm.append("Checkout <= ");
+                    sql_stm.append(date2);
+                }
+                if (!arg1.equals("ANY")) {
+                    sql_stm.append("CheckIn >= ");
+                    sql_stm.append(date1);
+                    sql_stm.append(" and ");
+                    sql_stm.append("Checkout <= ");
+                    sql_stm.append(date2);
+                    sql_stm.append(" and ");
+                    if(arg1Option.equals("A") || arg1Option.equals("B")){
+                        sql_stm.append(LinksToInputs.get(arg1Option));
+                        sql_stm.append(" LIKE %");
+                        sql_stm.append(arg1);
+                        sql_stm.append("%");
+                    }
+                    else{
+                        sql_stm.append(LinksToInputs.get(arg1Option));
+                        sql_stm.append(" = ");
+                        sql_stm.append(arg1);
+                    }
+                }
+            }
+        }
+
+        System.out.println(sql_stm);
+
+
+    }
+
 }
 
 
