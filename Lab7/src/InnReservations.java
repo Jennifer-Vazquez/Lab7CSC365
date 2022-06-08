@@ -1,3 +1,4 @@
+
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -38,8 +39,8 @@ public class InnReservations {
                 if (optionSelected.equals("4")) {
                     deleteReservation(myScan, conn);
                 }
-                if(optionSelected.equals("5")){
-                    detailedReservation(myScan,conn);
+                if (optionSelected.equals("5")) {
+                    detailedReservation(myScan, conn);
                 }
             }
         }
@@ -183,12 +184,12 @@ public class InnReservations {
     }
 
     //First name•Last name•A range of dates•Room code•Reservation code
-    public static void detailedReservation(Scanner scanner, Connection conn) {
+    public static void detailedReservation(Scanner scanner, Connection conn) throws SQLException {
         String arg1Option;
         String arg1 = "";
         String arg2Option;
         String arg2 = "";
-        StringBuilder sql_stm = new StringBuilder("select * from reservations where ");
+        StringBuilder sql_stm = new StringBuilder("select * from lab7_reservations where ");
 
         String date1 = null;
         String date2 = null;
@@ -196,33 +197,33 @@ public class InnReservations {
         System.out.println("Pick a pair from the following list: (A) First Name, (B) Last Name, (C) Range of Dates, (D) Room Code, (E) Reservation Code");
         System.out.println("Pick first option (type it how it is in the above list, enter 'ANY' for a blank entry");
         arg1Option = scanner.nextLine();
-        if(arg1Option.equals("A")){
+        if (arg1Option.equals("A")) {
             System.out.println("Enter First Name");
             arg1 = scanner.nextLine();
         }
-        if(arg1Option.equals("B")){
+        if (arg1Option.equals("B")) {
             System.out.println("Enter Last Name");
             arg1 = scanner.nextLine();
         }
-        if(arg1Option.equals("C")){
+        if (arg1Option.equals("C")) {
             System.out.println("Enter First Date (Format must be YYYY-MM-DD)");
             date1 = scanner.nextLine();
             System.out.println("Enter Second Date (Format must be YYYY-MM-DD)");
             date2 = scanner.nextLine();
         }
-        if(arg1Option.equals("D")){
+        if (arg1Option.equals("D")) {
             System.out.println("Enter Room Code");
             arg1 = scanner.nextLine();
         }
-        if(arg1Option.equals("E")){
+        if (arg1Option.equals("E")) {
             System.out.println("Enter Reservation Code");
             arg1 = scanner.nextLine();
         }
-        if(arg1Option.equals("ANY")){
+        if (arg1Option.equals("ANY")) {
             arg1 = "ANY";
         }
 
-        while(arg2.equals("")) {
+        while (arg2.equals("")) {
             System.out.println("Pick second option (type it how it is in the above list, enter 'ANY' for a blank entry");
             arg2Option = scanner.nextLine();
             if (arg2Option.equals("A")) {
@@ -248,62 +249,85 @@ public class InnReservations {
                 System.out.println("Enter Reservation Code");
                 arg2 = scanner.nextLine();
             }
-            if(arg2Option.equals("ANY")){
+            if (arg2Option.equals("ANY")) {
                 arg2 = "ANY";
             }
 
 
             if (!arg1Option.equals("C") && !arg2Option.equals("C")) {
                 if (!arg1.equals("ANY") && !arg2.equals("ANY")) {
-                    if(arg1Option.equals("A") || arg1Option.equals("B")){
+                    if (arg1Option.equals("A") || arg1Option.equals("B")) {
                         sql_stm.append(LinksToInputs.get(arg1Option));
-                        sql_stm.append(" LIKE %");
+                        sql_stm.append(" LIKE '%");
                         sql_stm.append(arg1);
-                        sql_stm.append("% and ");
-                    }
-                    else{
+                        sql_stm.append("%' and ");
+                    } else {
                         sql_stm.append(LinksToInputs.get(arg1Option));
-                        sql_stm.append(" = ");
-                        sql_stm.append(arg1);
-                        sql_stm.append(" and ");
+                        if(arg1Option.equals("D")){
+                            sql_stm.append(" = '");
+                            sql_stm.append(arg1);
+                            sql_stm.append("'");
+                            sql_stm.append(" and ");
+                        }
+                        else {
+                            sql_stm.append(" = ");
+                            sql_stm.append(arg1);
+                            sql_stm.append(" and ");
+                        }
                     }
-                    if(arg2Option.equals("A") || arg2Option.equals("B")){
+                    if (arg2Option.equals("A") || arg2Option.equals("B")) {
                         sql_stm.append(LinksToInputs.get(arg2Option));
-                        sql_stm.append(" LIKE %");
+                        sql_stm.append(" LIKE '%");
                         sql_stm.append(arg2);
-                        sql_stm.append("%");
-                    }
-                    else{
+                        sql_stm.append("%'");
+                    } else {
                         sql_stm.append(LinksToInputs.get(arg2Option));
-                        sql_stm.append(" = ");
-                        sql_stm.append(arg2);
+                        if(arg2Option.equals("D")){
+                            sql_stm.append(" = '");
+                            sql_stm.append(arg2);
+                            sql_stm.append("'");
+                        }
+                        else {
+                            sql_stm.append(" = ");
+                            sql_stm.append(arg2);
+                        }
                     }
                 }
                 if (arg1.equals("ANY")) {
-                    if(arg2Option.equals("A") || arg2Option.equals("B")){
+                    if (arg2Option.equals("A") || arg2Option.equals("B")) {
                         sql_stm.append(LinksToInputs.get(arg2Option));
-                        sql_stm.append(" LIKE %");
+                        sql_stm.append(" LIKE '%");
                         sql_stm.append(arg2);
-                        sql_stm.append("%");
-                    }
-                    else{
+                        sql_stm.append("%'");
+                    } else {
                         sql_stm.append(LinksToInputs.get(arg2Option));
-                        sql_stm.append(" = ");
-                        sql_stm.append(arg2);
+                        if(arg2Option.equals("D")){
+                            sql_stm.append(" = '");
+                            sql_stm.append(arg2);
+                            sql_stm.append("'");
+                        }
+                        else {
+                            sql_stm.append(" = ");
+                            sql_stm.append(arg2);
+                        }
                     }
                 }
                 if (arg2.equals("ANY")) {
-                    if(arg1Option.equals("A") || arg1Option.equals("B")){
+                    if (arg1Option.equals("A") || arg1Option.equals("B")) {
                         sql_stm.append(LinksToInputs.get(arg1Option));
-                        sql_stm.append(" LIKE %");
+                        sql_stm.append(" LIKE '%");
                         sql_stm.append(arg1);
-                        sql_stm.append("%");
-                    }
-                    else{
+                        sql_stm.append("%'");
+                    } else {
                         sql_stm.append(LinksToInputs.get(arg1Option));
-                        sql_stm.append(" = ");
-                        sql_stm.append(arg1);
-
+                        if(arg1Option.equals("D")){
+                            sql_stm.append(" = '");
+                            sql_stm.append(arg1);
+                            sql_stm.append("'");
+                        }else {
+                            sql_stm.append(" = ");
+                            sql_stm.append(arg1);
+                        }
                     }
                 }
             }
@@ -316,67 +340,110 @@ public class InnReservations {
                     sql_stm.append(date2);
                 }
                 if (!arg2.equals("ANY")) {
-                    sql_stm.append("CheckIn >= ");
+                    sql_stm.append("CheckIn >= '");
                     sql_stm.append(date1);
-                    sql_stm.append(" and ");
-                    sql_stm.append("Checkout <= ");
+                    sql_stm.append("' and ");
+                    sql_stm.append("Checkout <= '");
                     sql_stm.append(date2);
-                    sql_stm.append(" and ");
-                    if(arg2Option.equals("A") || arg2Option.equals("B")){
+                    sql_stm.append("' and ");
+                    if (arg2Option.equals("A") || arg2Option.equals("B")) {
                         sql_stm.append(LinksToInputs.get(arg2Option));
-                        sql_stm.append(" LIKE %");
+                        sql_stm.append(" LIKE '%");
                         sql_stm.append(arg2);
-                    }
-                    else{
+                        sql_stm.append("%'");
+                    } else {
                         sql_stm.append(LinksToInputs.get(arg2Option));
+                        if(arg2Option.equals("D")){
+                            sql_stm.append(" = '");
+                            sql_stm.append(arg2);
+                            sql_stm.append("'");
+                        }
+                        else {
+                            sql_stm.append(" = ");
+                            sql_stm.append(arg2);
+                        }
+                    }
+                    sql_stm.append(LinksToInputs.get(arg2Option));
+                    if(arg2Option.equals("D")){
+                        sql_stm.append(" = '");
+                        sql_stm.append(arg2);
+                        sql_stm.append("'");
+                    }
+                    else {
                         sql_stm.append(" = ");
                         sql_stm.append(arg2);
                     }
-                    sql_stm.append(LinksToInputs.get(arg2Option));
-                    sql_stm.append(" = ");
-                    sql_stm.append(arg2);
                 }
             }
 
             if (arg2Option.equals("C")) {
                 if (arg1.equals("ANY")) {
-                    sql_stm.append("CheckIn >= ");
+                    sql_stm.append("CheckIn >= '");
                     sql_stm.append(date1);
-                    sql_stm.append(" and ");
-                    sql_stm.append("Checkout <= ");
+                    sql_stm.append("' and ");
+                    sql_stm.append("Checkout <= '");
                     sql_stm.append(date2);
+                    sql_stm.append("'");
                 }
                 if (!arg1.equals("ANY")) {
-                    sql_stm.append("CheckIn >= ");
+                    sql_stm.append("CheckIn >= '");
                     sql_stm.append(date1);
-                    sql_stm.append(" and ");
-                    sql_stm.append("Checkout <= ");
+                    sql_stm.append("' and ");
+                    sql_stm.append("Checkout <= '");
                     sql_stm.append(date2);
-                    sql_stm.append(" and ");
-                    if(arg1Option.equals("A") || arg1Option.equals("B")){
+                    sql_stm.append("' and ");
+                    if (arg1Option.equals("A") || arg1Option.equals("B")) {
                         sql_stm.append(LinksToInputs.get(arg1Option));
-                        sql_stm.append(" LIKE %");
+                        sql_stm.append(" LIKE '%");
                         sql_stm.append(arg1);
-                        sql_stm.append("%");
-                    }
-                    else{
+                        sql_stm.append("%'");
+                    } else {
                         sql_stm.append(LinksToInputs.get(arg1Option));
-                        sql_stm.append(" = ");
-                        sql_stm.append(arg1);
+                        if(arg1Option.equals("D")){
+                            sql_stm.append(" = '");
+                            sql_stm.append(arg1);
+                            sql_stm.append("'");
+                        }
+                        else {
+                            sql_stm.append(" = ");
+                            sql_stm.append(arg1);
+                        }
                     }
                 }
             }
         }
 
         System.out.println(sql_stm);
+        String sql = sql_stm.toString();
 
+        //executing SQL statement.
+        try (PreparedStatement prep_stm = conn.prepareStatement(sql)) {
+            try (ResultSet res_set = prep_stm.executeQuery()) {
 
+                //Output of Statement.
+                System.out.format("\n%-10s %-10s %-15s %-15s %-10s %-20s %-20s %-10s %-10s\n", "Code", "Room", "CheckIn", "CheckOut", "Rate", "First Name", "Last Name", "Kids", "Adults");
+                System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+                //CODE	Room	CheckIn	Checkout	Rate	LastName	FirstName	Adults	Kids
+                while (res_set.next()) {
+                    int codeForRoom = res_set.getInt("Code");
+                    String RoomString = res_set.getString("Room");
+                    String CheckInString = res_set.getString("CheckIn");
+                    String CheckOutString = res_set.getString("CheckOut");
+                    float rateFloat = res_set.getFloat("Rate");
+                    String LastN = res_set.getString("LastName");
+                    String FirstN = res_set.getString("FirstName");
+                    int kidsNum = res_set.getInt("Kids");
+                    int adultsNum = res_set.getInt("Adults");
+                    System.out.format("\n%-10s %-10s %-15s %-15s %-10s %-20s %-20s %-10s %-10s\n", codeForRoom,RoomString, CheckInString, CheckOutString, rateFloat, FirstN, LastN, kidsNum, adultsNum);
+
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
-
 }
-
-
-
-
-
 
