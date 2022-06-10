@@ -469,6 +469,7 @@ public class InnReservations {
         String endD;
         String numOfChildren;
         String numOfAdults;
+        int counter = 1;
 
         ArrayList<PossibleEntries> possibilites = new ArrayList<PossibleEntries>();
         //PossibleEntries[] possibilites = new PossibleEntries[20];
@@ -529,42 +530,36 @@ public class InnReservations {
             allOptions.append("bedType = '" + bedT + "' and ");
             allOptions.append("maxOcc >= " + total);
 
-        }
-        else if(roomC.equals("ANY") && !bedT.equals("ANY")){
+        } else if (roomC.equals("ANY") && !bedT.equals("ANY")) {
             allOptions.append("select * from lab7_rooms where RoomCode in (select * from distinctRooms) and ");
             allOptions.append("bedType = '" + bedT + "' and ");
             allOptions.append("maxOcc >= " + total);
-        }
-        else if(!roomC.equals("ANY") && bedT.equals("ANY")){
+        } else if (!roomC.equals("ANY") && bedT.equals("ANY")) {
             allOptions.append("select * from lab7_rooms where RoomCode in (select * from distinctRooms) and ");
             allOptions.append("RoomCode = '" + roomC + "' and ");
             allOptions.append("maxOcc >= " + total);
         }
-        else {
-            doneAlready = true;
-            allOptions.append("select * from lab7_rooms where RoomCode in (select * from distinctRooms) and ");
-            allOptions.append("maxOcc >= " + total);
-        }
+
 
         String sql = allOptions.toString();
 
         //executing SQL statement.
         try (PreparedStatement prep_stm = conn.prepareStatement(sql)) {
             try (ResultSet res_set = prep_stm.executeQuery()) {
-                System.out.format("\n%-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", "Room Code", "Room Name", "Beds", "BedType", "maxOcc", "Base Price", "Decor");
-
+                System.out.format("\n%-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", "Number", "Room Code", "Room Name", "Beds", "BedType", "maxOcc", "Base Price", "Decor");
+                System.out.println("All Options considered:");
                 while (res_set.next()) {
                     String codeForRoom = res_set.getString("RoomCode");
                     String RoomString = res_set.getString("RoomName");
                     String Beds = res_set.getString("Beds");
                     String BedTy = res_set.getString("bedType");
                     int maxO = res_set.getInt("MaxOcc");
-                    int basePrice  = res_set.getInt("basePrice");
+                    int basePrice = res_set.getInt("basePrice");
                     String decor = res_set.getString("decor");
-                    System.out.format("\n%-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", codeForRoom, RoomString, Beds, BedTy, maxO, basePrice, decor);
+                    System.out.format("\n%-15s %-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", counter, codeForRoom, RoomString, Beds, BedTy, maxO, basePrice, decor);
                     PossibleEntries newP = new PossibleEntries(codeForRoom, RoomString, basePrice);
                     possibilites.add(newP);
-
+                    counter++;
 
                     //possibilites.add(new PossibleEntries)
                 }
@@ -574,18 +569,19 @@ public class InnReservations {
             }
         }
 
-        if(!doneAlready){
+        if (counter == 1) {
             StringBuilder RoomAva = new StringBuilder(sql_stm);
             RoomAva.append("select * from lab7_rooms where RoomCode in (select * from distinctRooms) and ");
             RoomAva.append("maxOcc >= " + total);
 
             String minSql = RoomAva.toString();
 
+
             //executing SQL statement.
             try (PreparedStatement prep_stm = conn.prepareStatement(minSql)) {
                 try (ResultSet res_set = prep_stm.executeQuery()) {
-                    System.out.format("\n%-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", "Room Code", "Room Name", "Beds", "BedType", "maxOcc", "Base Price", "Decor");
-
+                    //System.out.format("\n%-10s%-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", "Room Code", "Room Name", "Beds", "BedType", "maxOcc", "Base Price", "Decor");
+                    System.out.println("Only dates and availability considered");
                     while (res_set.next()) {
                         String codeForRoom = res_set.getString("RoomCode");
                         String RoomString = res_set.getString("RoomName");
@@ -594,9 +590,10 @@ public class InnReservations {
                         int maxO = res_set.getInt("MaxOcc");
                         int basePrice = res_set.getInt("basePrice");
                         String decor = res_set.getString("decor");
-                        System.out.format("\n%-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", codeForRoom, RoomString, Beds, BedTy, maxO, basePrice, decor);
+                        System.out.format("\n%-15s %-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", counter, codeForRoom, RoomString, Beds, BedTy, maxO, basePrice, decor);
                         PossibleEntries newP = new PossibleEntries(codeForRoom, RoomString, basePrice);
                         possibilites.add(newP);
+                        counter++;
 
                     }
 
@@ -605,10 +602,46 @@ public class InnReservations {
                 }
             }
         }
+        System.out.println("Would you like to book a reservation? Y/N");
+        String answer = scanner.nextLine();
+        if (answer.equals("Y")) {
+            System.out.println("Select the option you would like:");
+            int optionSelected = scanner.nextInt();
+            PossibleEntries option = possibilites.get(optionSelected - 1);
+            try (PreparedStatement pstmt = conn.prepareStatement("INSERT INTO lab7_reservations (CODE, Room, CheckIn, CheckOut, Rate, LastName, FirstName, Adults, Kids) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);")) {
+             int reserv_code = 0;
+                try (Statement stm2 = conn.createStatement()) {
+                    //Get max code from reservations to generate potential future next code.
+                    String sql2 = "SELECT max(CODE) as CODE from lab7_reservations;";
+                    ResultSet res_set2 = stm2.executeQuery(sql2);
 
+                    while (res_set2.next()) {
+                        String code = res_set2.getString("CODE");
+                        reserv_code = Integer.parseInt(code) + 1;
+                    }
+                    pstmt.setInt(1, reserv_code);
+                    pstmt.setString(2, option.RoomCode);
+                    pstmt.setDate(3, Date.valueOf(startD));
+                    pstmt.setDate(4, Date.valueOf(endD));
+                    pstmt.setDouble(5, option.rate);
+                    pstmt.setString(6, lastN);
+                    pstmt.setString(7, firstN);
+                    pstmt.setInt(8, Integer.parseInt(numOfAdults));
+                    pstmt.setInt(9, Integer.parseInt(numOfChildren));
 
+                    pstmt.executeUpdate();
+                    conn.commit();
+                    System.out.println("Successful reservation");
+                    scanner.nextLine();
+                }
+                catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
-}
+    }
+
 
 
 

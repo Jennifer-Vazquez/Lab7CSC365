@@ -84,7 +84,7 @@
       <workItem from="1654492400515" duration="722000" />
       <workItem from="1654664601112" duration="678000" />
       <workItem from="1654732174080" duration="9147000" />
-      <workItem from="1654798752980" duration="9880000" />
+      <workItem from="1654798752980" duration="14424000" />
     </task>
     <servers />
   </component>
@@ -108,22 +108,22 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="421" y="96" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1654137508050" />
-    <state width="895" height="111" key="GridCell.Tab.0.bottom" timestamp="1654811568141">
+    <state width="894" height="142" key="GridCell.Tab.0.bottom" timestamp="1654827501130">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="895" height="111" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1654811568141" />
-    <state width="895" height="111" key="GridCell.Tab.0.center" timestamp="1654811568141">
+    <state width="894" height="142" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1654827501130" />
+    <state width="894" height="142" key="GridCell.Tab.0.center" timestamp="1654827501130">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="895" height="111" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1654811568141" />
-    <state width="895" height="111" key="GridCell.Tab.0.left" timestamp="1654811568141">
+    <state width="894" height="142" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1654827501130" />
+    <state width="894" height="142" key="GridCell.Tab.0.left" timestamp="1654827501129">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="895" height="111" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1654811568141" />
-    <state width="895" height="111" key="GridCell.Tab.0.right" timestamp="1654811568141">
+    <state width="894" height="142" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1654827501129" />
+    <state width="894" height="142" key="GridCell.Tab.0.right" timestamp="1654827501130">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="895" height="111" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1654811568141" />
+    <state width="894" height="142" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1654827501130" />
     <state width="895" height="111" key="GridCell.Tab.1.bottom" timestamp="1654811568141">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -152,6 +152,10 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="91" y="0" key="new project wizard/0.0.1280.680@0.0.1280.680" timestamp="1654137311242" />
+    <state x="303" y="1" width="672" height="678" key="search.everywhere.popup" timestamp="1654823854521">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="303" y="1" width="672" height="678" key="search.everywhere.popup/0.0.1280.680@0.0.1280.680" timestamp="1654823854521" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -168,7 +172,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/Lab7/src/InnReservations.java</url>
-          <line>557</line>
+          <line>552</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -178,7 +182,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/Lab7/src/InnReservations.java</url>
-          <line>555</line>
+          <line>550</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
