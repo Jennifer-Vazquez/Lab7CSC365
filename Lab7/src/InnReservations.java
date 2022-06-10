@@ -547,8 +547,12 @@ public class InnReservations {
         try (PreparedStatement prep_stm = conn.prepareStatement(sql)) {
             try (ResultSet res_set = prep_stm.executeQuery()) {
                 System.out.format("\n%-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", "Number", "Room Code", "Room Name", "Beds", "BedType", "maxOcc", "Base Price", "Decor");
-                System.out.println("All Options considered:");
+
+                int counterToCheck = 0;
                 while (res_set.next()) {
+                    if(counterToCheck == 0){
+                        System.out.println("All Options considered:");
+                    }
                     String codeForRoom = res_set.getString("RoomCode");
                     String RoomString = res_set.getString("RoomName");
                     String Beds = res_set.getString("Beds");
@@ -560,8 +564,12 @@ public class InnReservations {
                     PossibleEntries newP = new PossibleEntries(codeForRoom, RoomString, basePrice);
                     possibilites.add(newP);
                     counter++;
+                    counterToCheck++;
 
                     //possibilites.add(new PossibleEntries)
+                }
+                if(counterToCheck == 0){
+                    System.out.println("Nothing is available based on your requests:");
                 }
 
             } catch (SQLException e) {
@@ -581,19 +589,21 @@ public class InnReservations {
             try (PreparedStatement prep_stm = conn.prepareStatement(minSql)) {
                 try (ResultSet res_set = prep_stm.executeQuery()) {
                     //System.out.format("\n%-10s%-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", "Room Code", "Room Name", "Beds", "BedType", "maxOcc", "Base Price", "Decor");
-                    System.out.println("Only dates and availability considered");
+                    System.out.println("Only dates and availability considered:");
                     while (res_set.next()) {
-                        String codeForRoom = res_set.getString("RoomCode");
-                        String RoomString = res_set.getString("RoomName");
-                        String Beds = res_set.getString("Beds");
-                        String BedTy = res_set.getString("bedType");
-                        int maxO = res_set.getInt("MaxOcc");
-                        int basePrice = res_set.getInt("basePrice");
-                        String decor = res_set.getString("decor");
-                        System.out.format("\n%-15s %-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", counter, codeForRoom, RoomString, Beds, BedTy, maxO, basePrice, decor);
-                        PossibleEntries newP = new PossibleEntries(codeForRoom, RoomString, basePrice);
-                        possibilites.add(newP);
-                        counter++;
+                        if(counter < 6) {
+                            String codeForRoom = res_set.getString("RoomCode");
+                            String RoomString = res_set.getString("RoomName");
+                            String Beds = res_set.getString("Beds");
+                            String BedTy = res_set.getString("bedType");
+                            int maxO = res_set.getInt("MaxOcc");
+                            int basePrice = res_set.getInt("basePrice");
+                            String decor = res_set.getString("decor");
+                            System.out.format("\n%-15s %-15s %-30s %-15s %-15s %-15s %-20s %-20s\n", counter, codeForRoom, RoomString, Beds, BedTy, maxO, basePrice, decor);
+                            PossibleEntries newP = new PossibleEntries(codeForRoom, RoomString, basePrice);
+                            possibilites.add(newP);
+                            counter++;
+                        }
 
                     }
 
