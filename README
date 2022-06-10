@@ -1,0 +1,10 @@
+(a)  the  list  of  all  members  of  the  team,
+Jennifer Vazquez
+Regina Chapuis
+(b)  any  compi-lation/runtime  instructions,  including  the  names  of  environment  variables  used  to  passJDBC URL, username and password, and
+Nothing in particular, the dates must be in the form YYYY-MM-DD and it is case sensitive
+HP_JDBC_URL : jdbc:mysql://db.labthreesixfive.com/jvazqu45?autoReconnect=true&useSSL=false
+HP_JDBC_USER : jvazqu45
+HP_JDBC_PW : wtr22_365-026838103
+c) information about any known bugs and/ordeficiencies.
+Nothing we know of.
