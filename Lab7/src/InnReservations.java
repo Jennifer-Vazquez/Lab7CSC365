@@ -32,9 +32,12 @@ public class InnReservations {
 
         String EnvURL = System.getenv("HP_JDBC_URL");
         System.out.println(EnvURL);
-        try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
-                System.getenv("HP_JDBC_USER"),
-                System.getenv("HP_JDBC_PW"))) {
+//        try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
+//                System.getenv("HP_JDBC_USER"),
+//                System.getenv("HP_JDBC_PW"))) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://db.labthreesixfive.com/jvazqu45?autoReconnect=true&useSSL=false",
+                "jvazqu45",
+                "wtr22_365-026838103")) {
 
 
             Scanner myScan = new Scanner(System.in);  // Create a Scanner object
@@ -57,6 +60,9 @@ public class InnReservations {
                 }
                 if (optionSelected.equals("5")) {
                     detailedReservation(myScan, conn);
+                }
+                if (optionSelected.equals("1")) {
+                    roomsAndRates(myScan, conn);
                 }
             }
         }
@@ -603,6 +609,49 @@ public class InnReservations {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+
+
+    }
+
+    public static void roomsAndRates(Scanner scanner, Connection conn) throws SQLException {
+        String sql = "with popularity as (select Room,\n" +
+                "round(sum(datediff(CheckOut,(select if (CheckIn < CURDATE() - interval 180 day, CURDATE() - interval 180 day, CheckIn )))) /180, 2) as Popularity\n" +
+                "from lab7_reservations \n" +
+                "where CheckOut between CURDATE() - interval 180 day and CURDATE() \n" +
+                "group by Room),\n" +
+                "next_avail as( select Room r1,\n" +
+                "    (select if(CheckOut > CURDATE(), CheckOut, CURDATE()) ) NextAvailable\n" +
+                "from lab7_reservations \n" +
+                "group by Room, CheckOut\n" +
+                "having CheckOut = (select max(CheckOut) from lab7_reservations where Room = r1)),\n" +
+                "last_occ as (select Room r1,\n" +
+                "    Datediff(CheckOut, CheckIn) LastStay\n" +
+                "from lab7_reservations \n" +
+                "group by Room, CheckOut, CheckIn\n" +
+                "having CheckOut = (select max(CheckOut) from lab7_reservations where Room = r1))\n" +
+                "select distinct l.Room,\n" +
+                "    Popularity,\n" +
+                "    NextAvailable,\n" +
+                "    LastStay\n" +
+                "from lab7_reservations l\n" +
+                "inner join popularity on popularity.Room = l.Room\n" +
+                "inner join next_avail on next_avail.r1=l.Room\n" +
+                "inner join last_occ on last_occ.r1=l.Room\n" +
+                "order by Popularity desc";
+
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            // Step 5: Receive results
+            System.out.printf("Room\tPopularity \tNext Date\t Last Stay Duration\n");
+            while (rs.next()) {
+                String Room = rs.getString("Room");
+                String nextAvail = rs.getString("NextAvailable");
+                float pop = rs.getFloat("Popularity");
+                int lastStay = rs.getInt("LastStay");
+                System.out.format("%s \t%.2f \t\t%s \t\t%d\n", Room, pop, nextAvail, lastStay);
             }
         }
 
